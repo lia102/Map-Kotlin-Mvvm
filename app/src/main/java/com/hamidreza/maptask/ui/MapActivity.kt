@@ -19,6 +19,9 @@ import com.mapbox.mapboxsdk.location.modes.CameraMode
 import com.mapbox.mapboxsdk.location.modes.RenderMode
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.Style
+import com.mapbox.mapboxsdk.plugins.annotation.SymbolManager
+import com.mapbox.mapboxsdk.plugins.annotation.SymbolOptions
+import com.mapbox.mapboxsdk.style.layers.Property
 import ir.map.sdk_map.MapirStyle
 import ir.map.sdk_map.maps.MapView
 import java.lang.Exception
@@ -29,6 +32,7 @@ class MapActivity : AppCompatActivity() {
     lateinit var map: MapboxMap
     lateinit var mapStyle: Style
     lateinit var mapView: MapView
+    private var path: String? = null
     private lateinit var lastKnowLatLng: LatLng
     private lateinit var locationEngine: LocationEngine
     private val callback: MyLocationCallback = MyLocationCallback(this)
@@ -46,43 +50,37 @@ class MapActivity : AppCompatActivity() {
                 mapStyle = style
                 enableLocationComponent()
             }
-
+            map.addOnMapClickListener {
+                addSymbolToMap(it)
+                if (path == null) {
+                    //isDes = false
+                    path = "${it.longitude},${it.latitude};"
+                }else{
+                    path += "${it.longitude},${it.latitude}"
+                }
+                false
+            }
         }
     }
 
-    override fun onStart() {
-        super.onStart()
-        mapView.onStart()
-    }
 
-    override fun onResume() {
-        super.onResume()
-        mapView.onResume()
-    }
-
-    override fun onPause() {
-        super.onPause()
-        mapView.onPause()
-    }
-
-    override fun onStop() {
-        super.onStop()
-        mapView.onStop()
-    }
-
-    override fun onLowMemory() {
-        super.onLowMemory()
-        mapView.onLowMemory()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        mapView.onDestroy()
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        mapView.onSaveInstanceState(outState)
+    private fun addSymbolToMap(latLng: LatLng) {
+        mapStyle.addImage(
+            "sample_image_id",
+            getResources().getDrawable(R.drawable.mapbox_marker_icon_default)
+        )
+        val sampleSymbolManager = SymbolManager(mapView, map, mapStyle)
+        sampleSymbolManager.apply {
+            iconAllowOverlap = true
+            iconRotationAlignment = Property.ICON_ROTATION_ALIGNMENT_VIEWPORT
+        }
+        val sampleSymbolOptions = SymbolOptions()
+        sampleSymbolOptions.apply {
+            withLatLng(latLng)
+            withIconImage("sample_image_id")
+            withIconSize(1.0f)
+            val sampleSymbol = sampleSymbolManager.create(sampleSymbolOptions)
+        }
     }
 
     private class MyLocationCallback(val activity: MapActivity) :
@@ -161,4 +159,40 @@ class MapActivity : AppCompatActivity() {
         locationEngine.requestLocationUpdates(request, callback, getMainLooper());
         locationEngine.getLastLocation(callback)
     }
+
+    override fun onStart() {
+        super.onStart()
+        mapView.onStart()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        mapView.onResume()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        mapView.onPause()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        mapView.onStop()
+    }
+
+    override fun onLowMemory() {
+        super.onLowMemory()
+        mapView.onLowMemory()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        mapView.onDestroy()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        mapView.onSaveInstanceState(outState)
+    }
+
 }
