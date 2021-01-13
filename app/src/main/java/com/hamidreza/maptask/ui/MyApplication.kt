@@ -1,4 +1,4 @@
-package com.hamidreza.maptask
+package com.hamidreza.maptask.ui
 
 import android.app.Application
 import com.hamidreza.maptask.utils.Conts.MAP_BOX_TOKEN
