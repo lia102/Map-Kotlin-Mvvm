@@ -4,6 +4,7 @@ import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.hamidreza.maptask.data.local.MapEntity
 import com.hamidreza.maptask.data.remote.response.RouteResponse
 import com.hamidreza.maptask.repository.MapRepository
 import com.hamidreza.maptask.utils.ResultWrapper
@@ -36,5 +37,15 @@ class MapViewModel @ViewModelInject constructor(val repo:MapRepository) :ViewMod
         return ResultWrapper.Error(response.code().toString())
 
     }
+
+    fun insertToMap(mapEntity: MapEntity){
+        viewModelScope.launch {
+            repo.insertToMap(mapEntity)
+        }
+    }
+
+    val getSymbols = repo.getSymbols()
+
+
 
 }
