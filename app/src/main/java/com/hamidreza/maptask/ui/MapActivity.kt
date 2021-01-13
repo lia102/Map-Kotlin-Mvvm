@@ -4,14 +4,19 @@ import android.annotation.SuppressLint
 import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
+import androidx.activity.viewModels
 import com.hamidreza.maptask.R
 import com.hamidreza.maptask.databinding.ActivityMapBinding
+import com.hamidreza.maptask.ui.viewmodels.MapViewModel
 import com.hamidreza.maptask.utils.Conts.DEFAULT_INTERVAL_IN_MILLISECONDS
 import com.hamidreza.maptask.utils.Conts.DEFAULT_MAX_WAIT_TIME
+import com.hamidreza.maptask.utils.ResultWrapper
 import com.mapbox.android.core.location.*
 import com.mapbox.android.core.permissions.PermissionsListener
 import com.mapbox.android.core.permissions.PermissionsManager
+import com.mapbox.geojson.LineString
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.location.LocationComponentActivationOptions
 import com.mapbox.mapboxsdk.location.LocationComponentOptions
@@ -19,20 +24,25 @@ import com.mapbox.mapboxsdk.location.modes.CameraMode
 import com.mapbox.mapboxsdk.location.modes.RenderMode
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.Style
+import com.mapbox.mapboxsdk.plugins.annotation.LineManager
+import com.mapbox.mapboxsdk.plugins.annotation.LineOptions
 import com.mapbox.mapboxsdk.plugins.annotation.SymbolManager
 import com.mapbox.mapboxsdk.plugins.annotation.SymbolOptions
 import com.mapbox.mapboxsdk.style.layers.Property
+import dagger.hilt.android.AndroidEntryPoint
 import ir.map.sdk_map.MapirStyle
 import ir.map.sdk_map.maps.MapView
 import java.lang.Exception
 import java.lang.ref.WeakReference
 
+@AndroidEntryPoint
 class MapActivity : AppCompatActivity() {
     lateinit var binding: ActivityMapBinding
     lateinit var map: MapboxMap
     lateinit var mapStyle: Style
     lateinit var mapView: MapView
     private var path: String? = null
+    private val viewModel : MapViewModel by viewModels()
     private lateinit var lastKnowLatLng: LatLng
     private lateinit var locationEngine: LocationEngine
     private val callback: MyLocationCallback = MyLocationCallback(this)
@@ -49,6 +59,17 @@ class MapActivity : AppCompatActivity() {
             map.setStyle(Style.Builder().fromUri(MapirStyle.MAIN_MOBILE_VECTOR_STYLE)) { style ->
                 mapStyle = style
                 enableLocationComponent()
+
+                viewModel.path.observe(this) {
+                    when (it) {
+                        is ResultWrapper.Success -> {
+                            showRouteOnMap(it.data)
+                        }
+                        is ResultWrapper.Error -> {
+                            Log.i("Response Error", "${it.msg} ")                        }
+                    }
+                }
+
             }
             map.addOnMapClickListener {
                 addSymbolToMap(it)
@@ -61,6 +82,24 @@ class MapActivity : AppCompatActivity() {
                 false
             }
         }
+
+        binding.btnGo.setOnClickListener {
+            viewModel.getPath(path ?: "")
+            Log.i("MAP LAT LNG", "$path ")
+        }
+
+    }
+
+
+    fun showRouteOnMap(geometry: String) {
+        val lineManager = LineManager(mapView, map, mapStyle)
+        val routeLine = LineString.fromPolyline(geometry, 5)
+        val lineOption = LineOptions()
+            .withGeometry(routeLine)
+            .withLineColor("#ff5252")
+            .withLineWidth(6f)
+
+        lineManager.create(lineOption)
     }
 
 
