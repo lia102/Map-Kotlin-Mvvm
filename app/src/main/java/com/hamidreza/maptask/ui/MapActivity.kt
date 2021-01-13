@@ -8,6 +8,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.activity.viewModels
 import com.hamidreza.maptask.R
+import com.hamidreza.maptask.data.local.MapEntity
 import com.hamidreza.maptask.databinding.ActivityMapBinding
 import com.hamidreza.maptask.ui.viewmodels.MapViewModel
 import com.hamidreza.maptask.utils.Conts.DEFAULT_INTERVAL_IN_MILLISECONDS
@@ -54,6 +55,11 @@ class MapActivity : AppCompatActivity() {
         setContentView(binding.root)
         mapView = binding.mapView
         mapView.onCreate(savedInstanceState)
+        viewModel.getSymbols.observe(this){
+            for (i in it){
+                Log.i("Data base map", "latitude:${i.latitude} ,longitude:${i.longitude}  ")
+            }
+        }
         mapView.getMapAsync { mapbox ->
             map = mapbox
             map.setStyle(Style.Builder().fromUri(MapirStyle.MAIN_MOBILE_VECTOR_STYLE)) { style ->
@@ -73,6 +79,7 @@ class MapActivity : AppCompatActivity() {
             }
             map.addOnMapClickListener {
                 addSymbolToMap(it)
+                viewModel.insertToMap(MapEntity(latitude = it.latitude,longitude = it.longitude))
                 if (path == null) {
                     //isDes = false
                     path = "${it.longitude},${it.latitude};"
