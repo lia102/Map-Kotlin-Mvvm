@@ -43,6 +43,7 @@ class MapActivity : AppCompatActivity() {
     lateinit var mapStyle: Style
     lateinit var mapView: MapView
     private var path: String? = null
+    private var symbolCount = 0
     private val viewModel : MapViewModel by viewModels()
     private lateinit var lastKnowLatLng: LatLng
     private lateinit var locationEngine: LocationEngine
@@ -55,11 +56,6 @@ class MapActivity : AppCompatActivity() {
         setContentView(binding.root)
         mapView = binding.mapView
         mapView.onCreate(savedInstanceState)
-        viewModel.getSymbols.observe(this){
-            for (i in it){
-                Log.i("Data base map", "latitude:${i.latitude} ,longitude:${i.longitude}  ")
-            }
-        }
         mapView.getMapAsync { mapbox ->
             map = mapbox
             map.setStyle(Style.Builder().fromUri(MapirStyle.MAIN_MOBILE_VECTOR_STYLE)) { style ->
@@ -78,15 +74,26 @@ class MapActivity : AppCompatActivity() {
 
             }
             map.addOnMapClickListener {
+                symbolCount++
                 addSymbolToMap(it)
                 viewModel.insertToMap(MapEntity(latitude = it.latitude,longitude = it.longitude))
-                if (path == null) {
-                    //isDes = false
-                    path = "${it.longitude},${it.latitude};"
-                }else{
-                    path += "${it.longitude},${it.latitude}"
+                if (symbolCount < 3){
+                    if (path == null) {
+                        path = "${it.longitude},${it.latitude};"
+                    }else{
+                        path += "${it.longitude},${it.latitude}"
+                    }
                 }
                 false
+            }
+        }
+
+        binding.ivSymbol.setOnClickListener{
+            viewModel.getSymbols.observe(this){
+                for (i in it){
+                    Log.i("Data base map", "latitude:${i.latitude} ,longitude:${i.longitude}  ")
+                    addSymbolToMap(LatLng(i.latitude,i.longitude))
+                }
             }
         }
 
