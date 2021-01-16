@@ -34,7 +34,7 @@ class MapViewModel @ViewModelInject constructor(val repo:MapRepository) :ViewMod
                 return ResultWrapper.Success(it.routes[0].geometry)
             }
         }
-        return ResultWrapper.Error(response.code().toString())
+        return ResultWrapper.Error("مبدا و مقصد را مشخص کنید")
 
     }
 

@@ -28,6 +28,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="40dp"
+        android:background="@drawable/btn_bg"
         android:fontFamily="@font/vazir_medium_fd"
         android:text="مسیر یابی"
         android:textSize="20sp"
@@ -44,24 +45,24 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
         android:fontFamily="@font/vazir_medium_fd"
-        android:text="بر روی نقشه یک مبدا و یک مقصد انتخاب و بر روی مسیر یابی کلیک کنید.نقاط ایجاد شده بعدی در دیتابیس ذخیره می شوند."
+        android:text="بر روی نقشه یک مبدا و یک مقصد انتخاب و بر روی مسیر یابی کلیک کنید.نقاط ایجاد شده بعدی در دیتابیس ذخیره می شوند.همچنین به منظور مشاهده نقاط دخیره شده در دیتابیس بر روی آیکن سمت چپ کلیک کنید"
         android:textAlignment="center"
         android:textColor="#3A3636"
-        android:textSize="15sp"
+        android:textSize="14sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <ImageView
+    <ImageButton
         android:id="@+id/iv_symbol"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
+        android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
-        android:padding="10dp"
         android:background="@drawable/symbol_bg"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:padding="10dp"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/map_view"
         mapbox:srcCompat="@drawable/ic_location" />
 

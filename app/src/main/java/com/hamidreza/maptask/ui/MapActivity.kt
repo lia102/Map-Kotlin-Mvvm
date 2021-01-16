@@ -68,7 +68,8 @@ class MapActivity : AppCompatActivity() {
                             showRouteOnMap(it.data)
                         }
                         is ResultWrapper.Error -> {
-                            Log.i("Response Error", "${it.msg} ")                        }
+                            Toast.makeText(this, it.msg, Toast.LENGTH_SHORT).show()
+                        }
                     }
                 }
 
